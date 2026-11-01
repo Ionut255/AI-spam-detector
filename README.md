@@ -2,9 +2,20 @@
 
 **An explainable SMS spam classifier built with Python, scikit-learn and Streamlit.**
 
+[**🚀 Try the live demo**](https://ai-spam-detector-df3arof2loyabguty9ipr2.streamlit.app/) · [**📸 Screenshot**](assets/screenshot.png) · [**📊 Model evaluation**](docs/model-evaluation.md)
+
+[![Python tests](https://github.com/Ionut255/AI-spam-detector/actions/workflows/tests.yml/badge.svg)](https://github.com/Ionut255/AI-spam-detector/actions/workflows/tests.yml)
+
 This junior AI developer portfolio project classifies English-language SMS messages as **SPAM** or **NOT SPAM**, displays an estimated spam probability, and explains which text features influenced the prediction.
 
-> **Status:** Working prototype, ready for Streamlit Community Cloud deployment after merging the deployment PR. The model is trained on SMS data, so predictions on full emails, other languages, or unfamiliar spam patterns may be unreliable. Do not use this demo as the sole security filter.
+> **Status:** Live demo deployed on Streamlit Community Cloud. The model is trained on English-language SMS data, so predictions on full emails, other languages, or unfamiliar spam patterns may be unreliable. Do not use this demo as the sole security filter.
+
+## Portfolio highlights
+
+- **End-to-end ML workflow:** dataset acquisition, deduplication, train/test split, feature extraction, modeling, evaluation, and deployment.
+- **Model selection:** compared Logistic Regression against Multinomial Naive Bayes on the same held-out split.
+- **Explainability:** displays feature contributions from the selected linear model; results are not causal explanations.
+- **Deployment and tests:** public Streamlit app and automated GitHub Actions checks.
 
 ## Features
 
@@ -58,15 +69,20 @@ Top positive and negative token contributions
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe train_model.py
 .\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
 Open the local URL displayed by Streamlit, usually `http://localhost:8501`.
 
-The first training run downloads the [SMS Spam Collection dataset](https://archive.ics.uci.edu/dataset/228/sms+spam+collection). If the download fails, extract the file `SMSSpamCollection` manually into `data/`, then rerun `train_model.py`.
+At first launch, the app automatically downloads the [SMS Spam Collection dataset](https://archive.ics.uci.edu/dataset/228/sms+spam+collection) and trains the model if `model/spam_pipeline.joblib` is missing. The fitted model, raw dataset and virtual environment are excluded from Git.
 
-**Why train before launching?** The fitted model is saved locally as `model/spam_pipeline.joblib`. It is excluded from Git, along with the raw dataset and the Python virtual environment. The app needs that model file to work.
+To train and **print evaluation metrics** explicitly, run:
+
+```powershell
+.\.venv\Scripts\python.exe train_model.py
+```
+
+If the dataset download fails, extract `SMSSpamCollection` manually into `data/` and rerun the training script.
 
 ### Run tests
 
@@ -120,8 +136,8 @@ Associated publication: Almeida, T. A., Gómez Hidalgo, J. M., & Yamakami, A. (2
 - **Reproducibility:** Scores depend on the dataset version, preprocessing, train/test split and model configuration.
 - **Cloud deployment:** The app trains the model when its artifact is missing. This depends on access to the UCI dataset on first startup, and startup times will vary.
 
-Potential improvements: cross-validation, threshold tuning to control false positives, probability calibration and a public Streamlit demo.
+Potential improvements: cross-validation, threshold tuning to control false positives, probability calibration, and broader dataset evaluation.
 
 ## Author
 
-Built as a practical machine-learning portfolio project. Add your GitHub profile and contact information here before publishing.
+Built as a practical machine-learning portfolio project by [Ionut255](https://github.com/Ionut255).
