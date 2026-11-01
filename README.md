@@ -6,7 +6,7 @@
 
 [![Python tests](https://github.com/Ionut255/AI-spam-detector/actions/workflows/tests.yml/badge.svg)](https://github.com/Ionut255/AI-spam-detector/actions/workflows/tests.yml)
 
-This junior AI developer portfolio project classifies English-language SMS messages as **SPAM** or **NOT SPAM**, displays an estimated spam probability, and explains which text features influenced the prediction.
+This project classifies English-language SMS messages as **SPAM** or **NOT SPAM**, displays an estimated spam probability, and explains which text features influenced the prediction.
 
 > **Status:** Live demo deployed on Streamlit Community Cloud. The model is trained on English-language SMS data, so predictions on full emails, other languages, or unfamiliar spam patterns may be unreliable. Do not use this demo as the sole security filter.
 
