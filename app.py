@@ -11,18 +11,29 @@ st.set_page_config(page_title="Smart Spam Detector", page_icon="🛡️")
 st.title("🛡️ Smart Spam Detector")
 st.write("Introdu un SMS în engleză și modelul va estima dacă este spam.")
 
-if not MODEL_FILE.exists():
-    st.warning("Modelul nu este antrenat încă. Rulează mai întâi: `python train_model.py`.")
-    st.stop()
-
-
-@st.cache_resource
+@st.cache_resource(show_spinner="Pregătesc modelul AI pentru prima pornire...")
 def load_model():
-    # Load only the model generated locally by train_model.py.
+    """Load the fitted pipeline, training it first on a fresh deployment."""
+    if not MODEL_FILE.is_file():
+        # Git excludes model artifacts; cloud containers start with no model.
+        # main() uses the reproducible train/test split from train_model.py.
+        from train_model import main as train_model_main
+
+        train_model_main()
     return joblib.load(MODEL_FILE)
 
 
-model = load_model()
+try:
+    model = load_model()
+except Exception:
+    import logging
+
+    logging.exception("Could not initialize the spam classifier")
+    st.error(
+        "Nu am putut încărca sau antrena modelul. "
+        "Verifică logurile aplicației și accesul la datasetul UCI."
+    )
+    st.stop()
 examples = {
     "Mesaj normal": "Hi! Are we still meeting at 5 pm tomorrow?",
     "Mesaj suspect": "Congratulations! Claim your FREE prize now! Call us today!",
