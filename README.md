@@ -4,7 +4,7 @@
 
 This junior AI developer portfolio project classifies English-language SMS messages as **SPAM** or **NOT SPAM**, displays an estimated spam probability, and explains which text features influenced the prediction.
 
-> **Status:** Working local prototype. The model is trained on SMS data, so predictions on full emails, other languages, or unfamiliar spam patterns may be unreliable. Do not use this demo as the sole security filter.
+> **Status:** Working prototype, ready for Streamlit Community Cloud deployment after merging the deployment PR. The model is trained on SMS data, so predictions on full emails, other languages, or unfamiliar spam patterns may be unreliable. Do not use this demo as the sole security filter.
 
 ## Features
 
@@ -91,6 +91,17 @@ smart-spam-detector/
 └── model/                     # Trained model artifact (not committed)
 ```
 
+## Deploy on Streamlit Community Cloud
+
+1. Open [share.streamlit.io](https://share.streamlit.io/) and sign in with GitHub.
+2. Choose **Create app** → **Deploy a public app from GitHub** (wording may vary).
+3. Select repository `Ionut255/AI-spam-detector`, branch `main`, and main file `app.py`.
+4. In the advanced settings, select **Python 3.13** if available.
+5. Deploy and wait for the first startup. On a new server, the app downloads the UCI SMS dataset, trains the classifier, and saves `model/spam_pipeline.joblib` locally. This may take longer than subsequent starts.
+6. If startup fails, review the app's **Manage app → Logs** for dataset/network or dependency errors.
+
+Cloud containers may restart or reset; the model will train again if its local artifact is missing. No external secrets are required for this public dataset.
+
 ## Screenshot
 
 ![Smart Spam Detector demo](assets/screenshot.png)
@@ -107,7 +118,7 @@ Associated publication: Almeida, T. A., Gómez Hidalgo, J. M., & Yamakami, A. (2
 - **Probability:** Scores are model outputs, not guaranteed calibrated probabilities. Calibration should be checked before relying on a decision threshold.
 - **Explanations:** Token contributions are associations within a linear classifier, not causal explanations.
 - **Reproducibility:** Scores depend on the dataset version, preprocessing, train/test split and model configuration.
-- **Cloud deployment:** Because trained model files are not pushed to GitHub, a cloud deployment will require an explicit training/build step or a securely distributed model artifact.
+- **Cloud deployment:** The app trains the model when its artifact is missing. This depends on access to the UCI dataset on first startup, and startup times will vary.
 
 Potential improvements: cross-validation, threshold tuning to control false positives, probability calibration and a public Streamlit demo.
 
