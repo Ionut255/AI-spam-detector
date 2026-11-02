@@ -103,7 +103,7 @@ if st.button("Analyze message", type="primary"):
                     st.write("No negative contributions found.")
 
             st.caption(
-                These values show feature contributions within the linear model, "
+                "These values show feature contributions within the linear model, "
                 "not causal explanations or guarantees. The model score also includes an intercept."
             )
 
