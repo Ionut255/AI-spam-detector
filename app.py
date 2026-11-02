@@ -9,9 +9,9 @@ MODEL_FILE = Path(__file__).resolve().parent / "model" / "spam_pipeline.joblib"
 
 st.set_page_config(page_title="Smart Spam Detector", page_icon="🛡️")
 st.title("🛡️ Smart Spam Detector")
-st.write("Introdu un SMS în engleză și modelul va estima dacă este spam.")
+st.write("Enter an English-language SMS message to check whether it is spam.")
 
-@st.cache_resource(show_spinner="Pregătesc modelul AI pentru prima pornire...")
+@st.cache_resource(show_spinner="Preparing the AI model for the first launch...")
 def load_model():
     """Load the fitted pipeline, training it first on a fresh deployment."""
     if not MODEL_FILE.is_file():
@@ -30,21 +30,21 @@ except Exception:
 
     logging.exception("Could not initialize the spam classifier")
     st.error(
-        "Nu am putut încărca sau antrena modelul. "
-        "Verifică logurile aplicației și accesul la datasetul UCI."
+        "Could not load or train the model. "
+        "Check the application logs and access to the UCI dataset."
     )
     st.stop()
 examples = {
-    "Mesaj normal": "Hi! Are we still meeting at 5 pm tomorrow?",
-    "Mesaj suspect": "Congratulations! Claim your FREE prize now! Call us today!",
+    "Regular message": "Hi! Are we still meeting at 5 pm tomorrow?",
+    "Suspicious message": "Congratulations! Claim your FREE prize now! Call us today!",
 }
-selected = st.selectbox("Exemple rapide (opțional)", ["Scriu propriul mesaj"] + list(examples))
+selected = st.selectbox("Quick examples (optional)", ["Write my own message"] + list(examples))
 initial_text = examples.get(selected, "")
-message = st.text_area("Mesaj de analizat", value=initial_text, height=140)
+message = st.text_area("Message to analyze", value=initial_text, height=140)
 
-if st.button("Analizează mesajul", type="primary"):
+if st.button("Analyze message", type="primary"):
     if not message.strip():
-        st.warning("Scrie un mesaj înainte de analiză.")
+        st.warning("Please enter a message before analyzing.")
     else:
         prediction = model.predict([message])[0]
         probabilities = model.predict_proba([message])[0]
@@ -52,22 +52,22 @@ if st.button("Analizează mesajul", type="primary"):
         spam_probability = float(probabilities[spam_index])
 
         if prediction == "spam":
-            st.error("Rezultat: SPAM")
+            st.error("Prediction: SPAM")
         else:
-            st.success("Rezultat: NOT SPAM")
-        st.metric("Probabilitate estimată de spam", f"{spam_probability:.1%}")
+            st.success("Prediction: NOT SPAM")
+        st.metric("Estimated spam probability", f"{spam_probability:.1%}")
         st.progress(spam_probability)
 
-        # Explicabilitate: contribuția cuvintelor prezente în mesaj
-        # la scorul produs de modelul liniar Logistic Regression.
-        with st.expander("🔎 De ce a decis modelul astfel?"):
+        # Explainability: each recognized term’s contribution to the
+        # score calculated by the Logistic Regression model.
+        with st.expander("🔎 Why did the model make this prediction?"):
             vectorizer = model.named_steps["tfidf"]
             classifier = model.named_steps["classifier"]
             text_vector = vectorizer.transform([message]).tocoo()
             vocabulary = vectorizer.get_feature_names_out()
 
-            # Pentru clasificarea binară, coeficienții corespund
-            # celei de-a doua clase din classes_.
+            # In binary classification, coefficients correspond to
+            # the second class in classes_.
             spam_direction = 1 if classifier.classes_[1] == "spam" else -1
             weights = classifier.coef_[0]
             contributions = [
@@ -87,24 +87,24 @@ if st.button("Analizează mesajul", type="primary"):
 
             left, right = st.columns(2)
             with left:
-                st.markdown("**Indicii către SPAM**")
+                st.markdown("**Evidence toward SPAM**")
                 if spam_words:
                     for word, score in spam_words:
                         st.write(f"• {word} (+{score:.3f})")
                 else:
-                    st.write("Nu au fost identificate indicii pozitive.")
+                    st.write("No positive contributions found.")
 
             with right:
-                st.markdown("**Indicii către NOT SPAM**")
+                st.markdown("**Evidence toward NOT SPAM**")
                 if normal_words:
                     for word, score in normal_words:
                         st.write(f"• {word} ({score:.3f})")
                 else:
-                    st.write("Nu au fost identificate indicii negative.")
+                    st.write("No negative contributions found.")
 
             st.caption(
-                "Aceste valori reprezintă contribuțiile termenilor în modelul liniar, "
-                "nu explicații cauzale sau certitudini. Scorul include și bias-ul modelului."
+                These values show feature contributions within the linear model, "
+                "not causal explanations or guarantees. The model score also includes an intercept."
             )
 
-st.caption("Model demonstrativ antrenat pe SMS-uri în engleză; poate greși și nu este un filtru de securitate.")
+st.caption("Demo model trained on English-language SMS messages. Predictions may be wrong; do not use as a security filter.")
